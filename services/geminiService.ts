@@ -1,5 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
-import { Answers, AdvancedConfig } from '../types';
+import { GoogleGenAI, Type } from "@google/genai";
+import { Answers, AdvancedConfig, Question } from '../types';
 import { QUESTIONS } from '../utils/questions';
 
 function buildPrompt(answers: Answers): string {
@@ -44,7 +44,6 @@ export const generateTechnicalPrompt = async (
         throw new Error("API Key không được cung cấp.");
     }
     
-    // CRITICAL FIX: Initialize GoogleGenAI here with the user-provided key.
     const ai = new GoogleGenAI({ apiKey: config.apiKey });
     
     const prompt = buildPrompt(answers);
@@ -52,7 +51,7 @@ export const generateTechnicalPrompt = async (
     try {
         const response = await ai.models.generateContent({
             model: config.model,
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: prompt,
             config: {
                 temperature: config.temperature,
                 topP: config.topP,
@@ -67,5 +66,70 @@ export const generateTechnicalPrompt = async (
              throw new Error("API Key không hợp lệ. Vui lòng kiểm tra lại.");
         }
         throw new Error("Không thể tạo prompt. Đã có lỗi xảy ra từ API.");
+    }
+};
+
+export const generateSuggestionsForQuestionGroup = async (
+    initialAnswers: Pick<Answers, 'purpose' | 'targetAudience' | 'mainFeatures'>,
+    questionsToSuggest: Question[],
+    config: AdvancedConfig
+): Promise<Answers> => {
+    if (!config.apiKey) {
+        throw new Error("API Key không được cung cấp để tạo gợi ý.");
+    }
+    if (questionsToSuggest.length === 0) {
+        return {};
+    }
+
+    const ai = new GoogleGenAI({ apiKey: config.apiKey });
+    
+    const questionIdsToSuggest = questionsToSuggest.map(q => q.id);
+
+    const prompt = `
+Hãy đóng vai một Kỹ sư Giải pháp (Solutions Architect) hiệu quả. Dựa trên ý tưởng cốt lõi của một dự án phần mềm, hãy đưa ra các gợi ý súc tích cho các hạng mục sau.
+
+**Ý tưởng cốt lõi của dự án:**
+*   **Mục đích chính:** ${initialAnswers.purpose || 'Chưa rõ'}
+*   **Đối tượng người dùng:** ${initialAnswers.targetAudience || 'Chưa rõ'}
+*   **Tính năng chính:** ${initialAnswers.mainFeatures || 'Chưa rõ'}
+
+**Yêu cầu:**
+*   Đưa ra câu trả lời cho các hạng mục được yêu cầu dưới dạng một đối tượng JSON.
+*   Các câu trả lời phải ngắn gọn, đi thẳng vào vấn đề và phù hợp với ý tưởng cốt lõi.
+*   **TUYỆT ĐỐI CHỈ TRẢ VỀ MỘT ĐỐI TƯỢNG JSON HỢP LỆ, KHÔNG CÓ BẤT KỲ GIẢI THÍCH HAY KÝ TỰ NÀO KHÁC BÊN NGOÀI.**
+
+Các key trong JSON phải là: ${questionIdsToSuggest.join(', ')}.
+`;
+    
+    const responseSchema = {
+        type: Type.OBJECT,
+        properties: questionIdsToSuggest.reduce((acc, qId) => {
+            acc[qId] = { type: Type.STRING };
+            return acc;
+        }, {} as Record<string, { type: Type }>)
+    };
+
+    try {
+        const response = await ai.models.generateContent({
+            model: config.model,
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: responseSchema,
+                temperature: 0, // Explicitly set for deterministic JSON output
+            },
+        });
+
+        const jsonString = response.text;
+        const suggestedAnswers = JSON.parse(jsonString);
+
+        return suggestedAnswers as Answers;
+        
+    } catch (error: any) {
+        console.error("Error generating suggestions for group from Gemini API:", error);
+         if (error.message.includes('API key not valid')) {
+             throw new Error("API Key không hợp lệ. Vui lòng kiểm tra lại.");
+        }
+        throw new Error("Không thể tạo gợi ý. Đã có lỗi xảy ra từ API.");
     }
 };

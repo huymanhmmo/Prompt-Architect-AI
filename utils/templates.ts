@@ -1,3 +1,5 @@
+// FIX: Import React to use React.FC type.
+import React from 'react';
 import { Template } from '../types';
 import {
     WebAppIcon,

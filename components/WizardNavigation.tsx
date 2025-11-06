@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from './icons';
+import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon, SparklesIcon } from './icons';
 
 interface WizardNavigationProps {
   currentStep: number;
@@ -7,9 +7,21 @@ interface WizardNavigationProps {
   onNext: () => void;
   onPrev: () => void;
   isNextDisabled: boolean;
+  onGenerateSuggestions: () => void;
+  isGeneratingSuggestions: boolean;
+  isFirstStepAnswered: boolean;
 }
 
-const WizardNavigation: React.FC<WizardNavigationProps> = ({ currentStep, totalSteps, onNext, onPrev, isNextDisabled }) => {
+const WizardNavigation: React.FC<WizardNavigationProps> = ({ 
+  currentStep, 
+  totalSteps, 
+  onNext, 
+  onPrev, 
+  isNextDisabled,
+  onGenerateSuggestions,
+  isGeneratingSuggestions,
+  isFirstStepAnswered
+}) => {
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
 
@@ -24,8 +36,17 @@ const WizardNavigation: React.FC<WizardNavigationProps> = ({ currentStep, totalS
         <span className="ml-2">Quay lại</span>
       </button>
 
-      <div className="text-sm text-content-200-light dark:text-content-200-dark">
-        Bước {currentStep + 1} / {totalSteps}
+      <div className="flex-grow text-center">
+        {isFirstStep && (
+          <button
+            onClick={onGenerateSuggestions}
+            disabled={isGeneratingSuggestions || !isFirstStepAnswered}
+            className="flex items-center justify-center mx-auto px-4 py-2 bg-brand-secondary-light dark:bg-brand-secondary-dark text-white rounded-md hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <SparklesIcon />
+            <span className="ml-2">{isGeneratingSuggestions ? 'Đang tạo gợi ý...' : 'Tạo gợi ý bằng AI'}</span>
+          </button>
+        )}
       </div>
 
       <button

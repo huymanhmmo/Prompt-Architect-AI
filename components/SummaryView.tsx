@@ -1,21 +1,18 @@
 import React from 'react';
-import { Answers, AdvancedConfig } from '../types';
+import { Answers } from '../types';
 import { QUESTIONS } from '../utils/questions';
 import { calculateCompletenessScore } from '../utils/score';
 import ScoreIndicator from './ScoreIndicator';
-import AdvancedConfigComponent from './AdvancedConfig';
 import { ArrowLeftIcon } from './icons';
 
 interface SummaryViewProps {
   answers: Answers;
   onGenerate: () => void;
   isLoading: boolean;
-  config: AdvancedConfig;
-  onConfigChange: (newConfig: AdvancedConfig) => void;
   onBack: () => void;
 }
 
-const SummaryView: React.FC<SummaryViewProps> = ({ answers, onGenerate, isLoading, config, onConfigChange, onBack }) => {
+const SummaryView: React.FC<SummaryViewProps> = ({ answers, onGenerate, isLoading, onBack }) => {
   const score = calculateCompletenessScore(answers, QUESTIONS.length);
 
   return (
@@ -28,10 +25,6 @@ const SummaryView: React.FC<SummaryViewProps> = ({ answers, onGenerate, isLoadin
       <p className="mt-4 mb-8 text-content-200-light dark:text-content-200-dark">
         {score < 50 ? "Bạn có thể quay lại để trả lời thêm câu hỏi để có prompt chi tiết hơn." : "Kết quả rất tốt! Sẵn sàng để tạo prompt."}
       </p>
-
-      <div className="max-w-md mx-auto">
-          <AdvancedConfigComponent config={config} onConfigChange={onConfigChange} />
-      </div>
 
       <div className="flex justify-center items-center space-x-4 mt-8">
          <button

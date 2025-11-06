@@ -23,3 +23,17 @@ export interface AdvancedConfig {
     topP: number;
     topK: number;
 }
+
+export interface Project {
+  id: string;
+  name: string;
+  lastSaved: string; // ISO string for date
+  state: {
+    // FIX: Allow 'dashboard' state to be saved in a project.
+    appState: 'dashboard' | 'wizard' | 'summary' | 'result';
+    answers: Answers;
+    currentStep: number;
+    prompt: string;
+    config: AdvancedConfig;
+  };
+}
