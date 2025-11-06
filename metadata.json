@@ -1,0 +1,5 @@
+{
+  "name": "Prompt Architect AI",
+  "description": "An application to help non-technical users build detailed software design prompts for AI. The app guides users through simple questions about their idea and automatically generates a comprehensive technical prompt.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prompt Architect AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- ADDED: Babel Standalone to transpile TSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              // Light Theme
+              'brand-primary-light': '#4f46e5',
+              'brand-secondary-light': '#7c3aed',
+              'base-100-light': '#f9fafb', // very light grey
+              'base-200-light': '#ffffff', // white
+              'base-300-light': '#e5e7eb', // light grey
+              'content-100-light': '#111827', // near black
+              'content-200-light': '#6b7280', // medium grey
+
+              // Dark Theme
+              'brand-primary-dark': '#6366f1',
+              'brand-secondary-dark': '#a78bfa',
+              'base-100-dark': '#111827', // near black
+              'base-200-dark': '#1f2937', // dark grey
+              'base-300-dark': '#374151', // medium grey
+              'content-100-dark': '#f9fafb', // near white
+              'content-200-dark': '#9ca3af', // light grey
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Simple transition for theme changes */
+      body, .bg-base-100, .bg-base-200, .text-content-100, .text-content-200, button, textarea, input, select {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "remark-gfm": "https://aistudiocdn.com/remark-gfm@^4.0.1"
+  }
+}
+</script>
+</head>
+  <body class="bg-base-100-light dark:bg-base-100-dark">
+    <div id="root"></div>
+    <!-- CHANGED: script type to "text/babel" to enable in-browser transpilation -->
+    <script type="text/babel" data-type="module" src="/index.tsx"></script>
+  </body>
+</html>
